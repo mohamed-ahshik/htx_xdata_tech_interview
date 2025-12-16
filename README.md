@@ -6,3 +6,4 @@
 ## Create envionment 
 - 'conda create -n htx_xdata_env python=3.12'
 - 'conda activate htx_xdata_env'
+- 'pip install -r requirements.txt'
