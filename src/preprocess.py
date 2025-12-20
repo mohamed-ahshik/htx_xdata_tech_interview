@@ -1,3 +1,4 @@
+import re
 import pandas as pd 
 
 
@@ -49,14 +50,32 @@ def create_remaining_lease_column(df:pd.DataFrame)->pd.DataFrame:
     
     return df
 
+def standarise_remaining_lease_datatype(df:pd.DataFrame)->pd.DataFrame:
+    columns = df.columns
+    column_name = 'remaining_lease'
+
+    if column_name in columns:
+        print(f"Column : {column_name} datatype before converting : {df[column_name].dtypes}")
+        df[column_name] = df[column_name].apply(
+            lambda x: re.search(r"(\d+)\s*years?", x).group(1)
+            if isinstance(x, str) and "year" in x.lower()
+            else x)
+
+        df = df.astype({column_name:'float64'})
+        print(f"Column : {column_name} datatype after converting : {df[column_name].dtypes}")  
+    return df
+
 def preprocess_pipeline(df:pd.DataFrame)->pd.DataFrame:
     df = remove_duplicates(df)
     df = standarise_resale_price_datatype(df)
     df = split_year_and_month(df)
     df = create_remaining_lease_column(df)
+    df = standarise_remaining_lease_datatype(df)
     print('-----------------------------------')
     
     return df
+
+
 
 if __name__ == "__main__":
     
