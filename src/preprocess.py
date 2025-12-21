@@ -94,6 +94,51 @@ def create_psf_column(df:pd.DataFrame)->pd.DataFrame:
     
     return df
 
+def create_address_block_road_town(df:pd.DataFrame)->pd.DataFrame:
+    df["address"] = df["block"] + " " + df["street_name"]
+    df["block"] = "B-" + df["block"]
+    df["road"] = df["street_name"]
+    df["town"] = df["town"]
+    
+    return df
+
+def standarise_road_address_abbreviation(df:pd.DataFrame)->pd.DataFrame:
+    abbreviations= {
+        "AVE": "AVENUE",
+        "BT": "BUKIT",
+        "C'WEALTH": "COMMONWEALTH",
+        "CL": "CLOSE",
+        "CRES": "CRESCENT",
+        "CTRL": "CENTRAL",
+        "DR": "DRIVE",
+        "GDNS": "GARDENS",
+        "JLN": "JALAN",  # Malay for "road"
+        "KG": "KAMPUNG",  # Malay for "village"
+        "LOR": "LORONG",  # Malay for "lane"
+        "NTH": "NORTH",
+        "PK": "PARK",
+        "PL": "PLACE",
+        "RD": "ROAD",
+        "ST": "STREET",
+        "ST.": "SAINT",
+        "STH": "SOUTH",
+        "TER": "TERRACE",
+        "TG": "TANJONG",  # Malay for "cape"
+        "UPP": "UPPER",
+    }
+    def apply_abbreviation(x):
+        """Expand all abbreviations in a road name"""
+        x_list = x.split()
+        x_list_out = [abbreviations.get(t, t) for t in x_list]
+        return " ".join(x_list_out)
+    
+    df["address"] = df["address"].apply(apply_abbreviation)
+    df['road'] = df['road'].apply(apply_abbreviation)
+    
+    return df
+
+
+
 def preprocess_pipeline(df:pd.DataFrame)->pd.DataFrame:
     df = remove_duplicates(df)
     df = standarise_resale_price_datatype(df)
@@ -104,6 +149,8 @@ def preprocess_pipeline(df:pd.DataFrame)->pd.DataFrame:
     df = create_floor_area_sqft_column(df)
     df = split_storey_range(df)
     df = create_psf_column(df)
+    df = create_address_block_road_town(df)
+    df = standarise_road_address_abbreviation(df)
     print('-----------------------------------')
     
     return df
