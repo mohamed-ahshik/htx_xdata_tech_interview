@@ -28,7 +28,17 @@ def standarise_resale_price_datatype(df:pd.DataFrame)->pd.DataFrame:
 
     if column_name in columns:
         print(f"Column : {column_name} datatype before converting : {df[column_name].dtypes}")
-        df = df.astype({column_name:'float64'})
+        df = df.astype({column_name:'int'})
+        print(f"Column : {column_name} datatype after converting : {df[column_name].dtypes}")  
+    return df
+
+def standarise_floor_area_sqm_datatype(df:pd.DataFrame)->pd.DataFrame:
+    columns = df.columns
+    column_name = 'floor_area_sqm'
+
+    if column_name in columns:
+        print(f"Column : {column_name} datatype before converting : {df[column_name].dtypes}")
+        df = df.astype({column_name:'int'})
         print(f"Column : {column_name} datatype after converting : {df[column_name].dtypes}")  
     return df
 
@@ -50,6 +60,12 @@ def create_remaining_lease_column(df:pd.DataFrame)->pd.DataFrame:
     
     return df
 
+def create_floor_area_sqft_column(df:pd.DataFrame)->pd.DataFrame:
+    
+    df["floor_area_sqft"] = (df["floor_area_sqm"] * 10.7639).astype(int)
+
+    return df
+
 def standarise_remaining_lease_datatype(df:pd.DataFrame)->pd.DataFrame:
     columns = df.columns
     column_name = 'remaining_lease'
@@ -61,16 +77,33 @@ def standarise_remaining_lease_datatype(df:pd.DataFrame)->pd.DataFrame:
             if isinstance(x, str) and "year" in x.lower()
             else x)
 
-        df = df.astype({column_name:'float64'})
+        df = df.astype({column_name:'int'})
         print(f"Column : {column_name} datatype after converting : {df[column_name].dtypes}")  
+    return df
+
+def split_storey_range(df:pd.DataFrame)->pd.DataFrame:
+    df["storey_min"] = df["storey_range"].str.split(" ").str[0].astype(int)
+    df["storey_max"] = df["storey_range"].str.split(" ").str[2].astype(int)
+    
+    return df
+
+def create_psf_column(df:pd.DataFrame)->pd.DataFrame:
+    
+    df["psf_temp"] = (df["resale_price"] / df["floor_area_sqft"] * 100).round(2)
+    df["psf"] = df["psf_temp"].astype(int) / 100
+    
     return df
 
 def preprocess_pipeline(df:pd.DataFrame)->pd.DataFrame:
     df = remove_duplicates(df)
     df = standarise_resale_price_datatype(df)
+    df = standarise_floor_area_sqm_datatype(df)
     df = split_year_and_month(df)
     df = create_remaining_lease_column(df)
     df = standarise_remaining_lease_datatype(df)
+    df = create_floor_area_sqft_column(df)
+    df = split_storey_range(df)
+    df = create_psf_column(df)
     print('-----------------------------------')
     
     return df
