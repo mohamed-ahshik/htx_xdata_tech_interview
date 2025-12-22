@@ -15,6 +15,15 @@
        args: 
        - --max-line-length=88
        - --ignore=E203,E501,W503
+
+    # flake8 (Jupyter notebooks via nbqa)
+   - repo: https://github.com/nbQA-dev/nbQA
+     rev: 1.8.5
+     hooks:
+       - id: nbqa-flake8
+         args:
+           - --max-line-length=88
+           - --ignore=E203,E501,W503
   # isort
    - repo: https://github.com/pycqa/isort
      rev: 7.0.0
@@ -24,3 +33,10 @@
           - "--profile"
           - "black"
           - "--filter-files"
+    # isort (Jupyter notebooks via nbqa)
+   - repo: https://github.com/nbQA-dev/nbQA
+     rev: 1.8.5
+     hooks:
+       - id: nbqa-isort
+         args:
+           - --profile=black
