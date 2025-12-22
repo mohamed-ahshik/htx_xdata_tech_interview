@@ -1,4 +1,12 @@
 repos:
+    # black (Jupyter notebooks via nbqa) - ADD THIS!
+  - repo: https://github.com/nbQA-dev/nbQA
+    rev: 1.8.5
+    hooks:
+      - id: nbqa-black
+        args:
+          - --line-length=88
+  
   - repo: https://github.com/psf/black
     rev: 25.12.0
     hooks:
